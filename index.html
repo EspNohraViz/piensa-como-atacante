@@ -180,7 +180,13 @@ body[data-lens="eng"] .atk-text{display:none}
   background:rgba(255,226,122,.75);box-shadow:0 1px 2px rgba(0,0,0,.12);
 }
 .sheet h3{font-family:var(--hand);font-size:1.8rem;margin:0 0 .2rem}
-.sheet .check li{margin:0;padding:.35rem 0;border-bottom:1px solid #DCE6EE}
+.tests-wrap{overflow-x:auto}
+.tests{border-collapse:collapse;width:100%;min-width:560px;font-size:.97rem}
+.tests th{font-family:var(--hand);font-size:1.35rem;font-weight:700;text-align:left;padding:.2rem .5rem;border-bottom:2px solid #9FB6C8}
+.tests td{padding:.55rem .5rem;border-bottom:1px solid #DCE6EE;vertical-align:top}
+.tests td:first-child{white-space:nowrap;width:5.5rem}
+.tl{display:inline-grid;place-items:center;width:1.9rem;height:1.9rem;margin-right:.25rem;border:2px solid var(--atk);border-radius:50%;
+  font-family:var(--hand);font-size:1.35rem;font-weight:700;color:var(--atk);transform:rotate(-4deg)}
 .flow{counter-reset:f;list-style:none;padding:0;margin:.4rem 0}
 .flow li{counter-increment:f;position:relative;padding-left:2rem;margin:.35rem 0;font-size:.97rem}
 .flow li::before{content:counter(f);position:absolute;left:0;top:.05rem;width:1.5rem;height:1.5rem;border-radius:50%;background:var(--ink);color:#fff;font-size:.8rem;display:grid;place-items:center;font-weight:700}
@@ -226,14 +232,6 @@ code{font-size:.9em;background:#EEF1F4;padding:.05rem .3rem;border-radius:3px}
 .btn:disabled{opacity:.4;cursor:default}
 .hs-count{color:var(--ink-soft);font-size:.9rem}
 .warn{background:var(--atk-soft);border-radius:4px;padding:.6rem .8rem;margin-top:.8rem;font-size:.95rem}
-
-/* Checklist */
-.check{list-style:none;padding:0;margin:.5rem 0}
-.check li{margin:.4rem 0}
-.check label{display:flex;gap:.6rem;align-items:flex-start;cursor:pointer}
-.check input{width:1.2rem;height:1.2rem;margin-top:.25rem;accent-color:var(--eng)}
-.progress{height:10px;background:#EEF1F4;border-radius:999px;overflow:hidden;max-width:420px}
-.progress span{display:block;height:100%;width:0;background:var(--eng);transition:width .3s}
 
 /* Video */
 .video{position:relative;aspect-ratio:16/9;max-width:820px;border-radius:6px;overflow:hidden;background:#000;margin-top:.6rem}
@@ -579,19 +577,24 @@ footer{max-width:1180px;margin:0 auto;padding:0 clamp(1rem,4vw,2.5rem) 2.5rem;co
     </article>
   </div>
   <div class="sheet">
-    <h3>Lista de verificación de RadicaPQRS</h3>
-    <p style="margin:0 0 .3rem">Cada prueba nace de una amenaza del paso 2. Márcalas a medida que las revises:</p>
-    <ul class="check" id="checklist">
-      <li><label><input type="checkbox"> Tras cinco contraseñas erradas, la cuenta del funcionario se bloquea (S).</label></li>
-      <li><label><input type="checkbox"> Un adjunto modificado después de radicado no coincide con su hash registrado (T).</label></li>
-      <li><label><input type="checkbox"> Cada cierre de PQRS queda en la auditoría con usuario, fecha y hora (R).</label></li>
-      <li><label><input type="checkbox"> Cambiar el número de radicado sin el código de verificación no muestra datos ajenos (I).</label></li>
-      <li><label><input type="checkbox"> Cien radicaciones por minuto desde un mismo origen son rechazadas (D).</label></li>
-      <li><label><input type="checkbox"> Un funcionario que abre la URL de administración recibe acceso denegado (E).</label></li>
-      <li><label><input type="checkbox"> El servidor rechaza una conexión que solo ofrece suites RC4.</label></li>
-    </ul>
-  <div class="progress" aria-hidden="true"><span id="progress"></span></div>
-  <p class="hs-count" id="progress-text" aria-live="polite"></p>
+    <h3>Casos de prueba de seguridad de RadicaPQRS</h3>
+    <p style="margin:0 0 .6rem">Así se verificaría el sistema antes de salir a producción. Cada caso nace de una amenaza del paso 2.</p>
+    <div class="tests-wrap">
+      <table class="tests">
+        <thead>
+          <tr><th scope="col">Amenaza</th><th scope="col">Prueba</th><th scope="col">Resultado esperado</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><span class="tl">S</span></td><td>Ingresar cinco contraseñas erradas en la cuenta de un funcionario.</td><td>La cuenta se bloquea y el intento queda registrado.</td></tr>
+          <tr><td><span class="tl">T</span></td><td>Modificar un adjunto después de radicado.</td><td>El hash calculado no coincide con el registrado y el sistema alerta la alteración.</td></tr>
+          <tr><td><span class="tl">R</span></td><td>Cerrar una PQRS con una cuenta de funcionario.</td><td>La auditoría registra usuario, fecha y hora del cierre.</td></tr>
+          <tr><td><span class="tl">I</span></td><td>Consultar un número de radicado ajeno sin el código de verificación.</td><td>No se muestra ningún dato y la respuesta es un mensaje genérico.</td></tr>
+          <tr><td><span class="tl">D</span></td><td>Enviar cien radicaciones por minuto desde un mismo origen.</td><td>Las solicitudes que superan el límite son rechazadas.</td></tr>
+          <tr><td><span class="tl">E</span></td><td>Abrir la URL de administración con una cuenta de funcionario.</td><td>Acceso denegado.</td></tr>
+          <tr><td><span class="tl">T</span><span class="tl">I</span></td><td>Intentar una conexión que solo ofrece suites RC4.</td><td>El servidor termina el saludo sin establecer la conexión <span class="cite">(Popov, 2015)</span>.</td></tr>
+        </tbody>
+      </table>
+    </div>
   </div>
 </section>
 
@@ -671,16 +674,6 @@ prev.addEventListener("click", () => { if (i > 0) { i--; render(); } });
 next.addEventListener("click", () => { if (i < steps.length - 1) { i++; render(); } });
 render();
 
-// Lista de verificación
-const boxes = document.querySelectorAll("#checklist input");
-const bar = document.getElementById("progress"), ptext = document.getElementById("progress-text");
-function update(){
-  const done = [...boxes].filter(b => b.checked).length;
-  bar.style.width = (done / boxes.length * 100) + "%";
-  ptext.textContent = done + " de " + boxes.length + " pruebas revisadas";
-}
-boxes.forEach(b => b.addEventListener("change", update));
-update();
 </script>
 </body>
 </html>
