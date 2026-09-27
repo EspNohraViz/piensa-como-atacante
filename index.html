@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Piensa como atacante, construye como ingeniero | Mural de modelado de amenazas</title>
+<meta name="description" content="Mural digital sobre modelado de amenazas aplicado a un sistema de radicación de PQRS de ejemplo.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Caveat:wght@600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --board:#E6EBEF;
+  --paper:#FFFFFF;
+  --ink:#1D2B3A;
+  --ink-soft:#4A5A6B;
+  --atk:#B8322A;
+  --atk-soft:#F8E1DE;
+  --eng:#12715B;
+  --eng-soft:#DCF1EA;
+  --sticky:#FFE27A;
+  --line:#C9D2DA;
+  --hand:'Caveat', 'Segoe Print', cursive;
+  --body:'Atkinson Hyperlegible', 'Segoe UI', Arial, sans-serif;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;background:var(--board);color:var(--ink);
+  font-family:var(--body);font-size:1.0625rem;line-height:1.6;
+  background-image:radial-gradient(#d5dce3 1px, transparent 1px);
+  background-size:22px 22px;
+}
+a{color:var(--ink)}
+:focus-visible{outline:3px solid var(--ink);outline-offset:3px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}html{scroll-behavior:auto}}
+
+/* Barra de lente */
+.lens{
+  position:sticky;top:0;z-index:20;
+  display:flex;flex-wrap:wrap;gap:.75rem;align-items:center;justify-content:space-between;
+  padding:.6rem clamp(1rem,4vw,2.5rem);
+  background:rgba(230,235,239,.94);backdrop-filter:blur(6px);
+  border-bottom:1px solid var(--line);
+}
+.lens p{margin:0;font-size:.95rem;color:var(--ink-soft)}
+.switch{display:inline-flex;border:2px solid var(--ink);border-radius:999px;overflow:hidden;background:var(--paper)}
+.switch button{
+  font:inherit;font-weight:700;font-size:.95rem;border:0;background:transparent;color:var(--ink);
+  padding:.4rem 1rem;cursor:pointer;
+}
+.switch button[aria-pressed="true"][data-lens="atk"]{background:var(--atk);color:#fff}
+.switch button[aria-pressed="true"][data-lens="eng"]{background:var(--eng);color:#fff}
+
+/* Encabezado */
+header.hero{padding:clamp(2rem,6vw,4.5rem) clamp(1rem,4vw,2.5rem) 1.5rem;max-width:1180px;margin:0 auto}
+.hero h1{
+  font-family:var(--hand);font-weight:700;line-height:1;margin:0 0 1rem;
+  font-size:clamp(2.6rem,7vw,5.2rem);max-width:16ch;
+}
+.hero h1 .l1{display:block;color:var(--atk)}
+.hero h1 .l2{display:block;color:var(--eng)}
+.hero .sub{font-size:1.2rem;max-width:60ch;margin:0 0 1.25rem}
+.disclaimer{
+  display:inline-block;background:var(--sticky);padding:.6rem .9rem;border-radius:2px;
+  box-shadow:2px 3px 0 rgba(29,43,58,.18);transform:rotate(-1deg);max-width:60ch;font-size:.97rem;
+}
+.author{margin-top:1.25rem;color:var(--ink-soft);font-size:.95rem}
+.author strong{color:var(--ink)}
+
+/* Tablero */
+main{max-width:1180px;margin:0 auto;padding:0 clamp(1rem,4vw,2.5rem) 3rem;display:grid;gap:1.75rem;grid-template-columns:repeat(12,1fr)}
+.zone{
+  grid-column:span 12;background:var(--paper);border-radius:6px;
+  padding:clamp(1.1rem,3vw,2rem);position:relative;
+  box-shadow:0 1px 0 var(--line), 0 10px 24px -18px rgba(29,43,58,.45);
+}
+.zone::before{ /* chincheta */
+  content:"";position:absolute;top:-8px;left:50%;width:16px;height:16px;border-radius:50%;
+  background:var(--ink);box-shadow:0 2px 0 rgba(0,0,0,.25);transform:translateX(-50%);
+}
+@media (min-width:900px){.half{grid-column:span 6}}
+.zone h2{font-family:var(--hand);font-size:clamp(1.9rem,4vw,2.5rem);line-height:1.1;margin:0 0 .35rem}
+.zone h3{font-size:1.1rem;margin:1.2rem 0 .4rem}
+.zone p{max-width:72ch;margin:.4rem 0 .8rem}
+.step{color:var(--ink-soft);font-size:.95rem;margin:0 0 .75rem}
+.cite{color:var(--ink-soft);font-size:.92rem}
+.takeaway{border-left:4px solid var(--ink);padding:.3rem 0 .3rem 1rem;margin:1rem 0 0;font-weight:700;max-width:65ch}
+
+/* Notas adhesivas */
+.notes{display:grid;gap:1rem;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));margin-top:1rem}
+.note{background:var(--sticky);padding:1rem;border-radius:2px;box-shadow:2px 4px 0 rgba(29,43,58,.15)}
+.note:nth-child(odd){transform:rotate(-.8deg)}
+.note:nth-child(even){transform:rotate(.7deg)}
+.note h3{font-family:var(--hand);font-size:1.6rem;margin:0 0 .2rem;line-height:1.1}
+.note p{margin:0;font-size:.97rem}
+
+/* DFD */
+.dfd-wrap{overflow-x:auto;margin:1rem 0;border:1px dashed var(--line);border-radius:6px;background:#FAFBFC}
+.dfd{display:block;min-width:760px;width:100%;height:auto}
+.dfd text{font-family:var(--body);fill:var(--ink)}
+.dfd .layer-atk text,.dfd .layer-eng text{fill:#fff}
+.dfd .zone-label{fill:var(--ink-soft)}
+.dfd .boundary{fill:var(--atk)}
+.layer-atk,.layer-eng{transition:opacity .25s}
+body[data-lens="atk"] .layer-eng{opacity:0}
+body[data-lens="eng"] .layer-atk{opacity:0}
+.legend{display:flex;flex-wrap:wrap;gap:1rem;font-size:.92rem;color:var(--ink-soft)}
+.legend span::before{content:"";display:inline-block;width:12px;height:12px;margin-right:.4rem;vertical-align:-1px;border-radius:2px;background:currentColor}
+.lg-atk{color:var(--atk)} .lg-eng{color:var(--eng)}
+
+.cols{display:grid;gap:1rem;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.list{margin:.3rem 0 0;padding-left:1.1rem}
+.list li{margin:.25rem 0}
+.tag{font-weight:700}
+
+/* STRIDE */
+.stride{display:grid;gap:1rem;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));margin-top:1rem}
+.threat{border:2px solid var(--ink);border-radius:6px;background:var(--paper);overflow:hidden}
+.threat summary{list-style:none;cursor:pointer;display:flex;gap:.8rem;align-items:center;padding:.8rem 1rem}
+.threat summary::-webkit-details-marker{display:none}
+.letter{font-family:var(--hand);font-size:2.6rem;line-height:1;width:2.6rem;text-align:center;color:var(--atk)}
+body[data-lens="eng"] .letter{color:var(--eng)}
+.threat summary strong{display:block;font-size:1.02rem}
+.threat summary small{color:var(--ink-soft)}
+.risk{margin-left:auto;font-size:.8rem;font-weight:700;padding:.15rem .5rem;border-radius:999px;white-space:nowrap}
+.risk.alto{background:var(--atk-soft);color:var(--atk)}
+.risk.medio{background:#FFF1C9;color:#7A5A00}
+.threat .body{padding:0 1rem 1rem;border-top:1px dashed var(--line)}
+.threat .atk-text,.threat .eng-text{margin:.7rem 0 0;padding:.6rem .75rem;border-radius:4px;font-size:.97rem}
+.threat .atk-text{background:var(--atk-soft)}
+.threat .eng-text{background:var(--eng-soft)}
+body[data-lens="atk"] .eng-text{display:none}
+body[data-lens="eng"] .atk-text{display:none}
+.threat .who{font-weight:700;display:block;font-size:.85rem;margin-bottom:.15rem}
+
+/* Matriz de calor */
+.heat{display:grid;grid-template-columns:auto repeat(3,1fr);gap:4px;max-width:560px;margin-top:1rem;font-size:.9rem}
+.heat .ax{display:flex;align-items:center;justify-content:center;color:var(--ink-soft);padding:.3rem;text-align:center}
+.heat .cell{min-height:72px;border-radius:4px;display:flex;flex-wrap:wrap;gap:.3rem;align-content:center;justify-content:center;padding:.4rem}
+.c1{background:#E3F1EC}.c2{background:#FFF1C9}.c3{background:#F8E1DE}
+.chip{font-family:var(--hand);font-size:1.5rem;font-weight:700;width:2rem;height:2rem;display:grid;place-items:center;border-radius:50%;background:var(--paper);border:2px solid var(--ink)}
+
+/* Componentes */
+.comp{display:grid;gap:1rem;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));margin-top:.5rem}
+.card{border:1px solid var(--line);border-radius:6px;padding:1rem;background:#FBFCFD}
+.card h3{margin-top:0}
+.flow{counter-reset:f;list-style:none;padding:0;margin:.4rem 0}
+.flow li{counter-increment:f;position:relative;padding-left:2rem;margin:.35rem 0;font-size:.97rem}
+.flow li::before{content:counter(f);position:absolute;left:0;top:.05rem;width:1.5rem;height:1.5rem;border-radius:50%;background:var(--ink);color:#fff;font-size:.8rem;display:grid;place-items:center;font-weight:700}
+table.flags{border-collapse:collapse;width:100%;font-size:.93rem;margin-top:.4rem}
+.flags th,.flags td{border-bottom:1px solid var(--line);padding:.35rem .4rem;text-align:left;vertical-align:top}
+code{font-size:.9em;background:#EEF1F4;padding:.05rem .3rem;border-radius:3px}
+
+/* Handshake */
+.hs{margin-top:.6rem}
+.hs-lane{display:grid;grid-template-columns:1fr 3fr 1fr;align-items:center;gap:.5rem;text-align:center;font-weight:700;font-size:.9rem}
+.hs-stage{min-height:120px;border:1px dashed var(--line);border-radius:6px;padding:.8rem;background:var(--paper);font-weight:400}
+.hs-arrow{font-size:1.6rem;display:block;color:var(--eng)}
+.hs-controls{display:flex;gap:.5rem;align-items:center;margin-top:.6rem}
+.btn{font:inherit;font-weight:700;border:2px solid var(--ink);background:var(--paper);border-radius:999px;padding:.3rem .9rem;cursor:pointer}
+.btn:disabled{opacity:.4;cursor:default}
+.hs-count{color:var(--ink-soft);font-size:.9rem}
+.warn{background:var(--atk-soft);border-radius:4px;padding:.6rem .8rem;margin-top:.8rem;font-size:.95rem}
+
+/* Checklist */
+.check{list-style:none;padding:0;margin:.5rem 0}
+.check li{margin:.4rem 0}
+.check label{display:flex;gap:.6rem;align-items:flex-start;cursor:pointer}
+.check input{width:1.2rem;height:1.2rem;margin-top:.25rem;accent-color:var(--eng)}
+.progress{height:10px;background:#EEF1F4;border-radius:999px;overflow:hidden;max-width:420px}
+.progress span{display:block;height:100%;width:0;background:var(--eng);transition:width .3s}
+
+/* Video */
+.video{position:relative;aspect-ratio:16/9;max-width:820px;border-radius:6px;overflow:hidden;background:#000;margin-top:.6rem}
+.video iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+
+/* Referencias */
+.refs p{padding-left:2.2rem;text-indent:-2.2rem;margin:.55rem 0;max-width:none;overflow-wrap:anywhere}
+
+footer{max-width:1180px;margin:0 auto;padding:0 clamp(1rem,4vw,2.5rem) 2.5rem;color:var(--ink-soft);font-size:.9rem}
+</style>
+</head>
+<body data-lens="atk">
+
+<div class="lens" role="region" aria-label="Cambiar perspectiva del mural">
+  <p>Mira el mural con los ojos de:</p>
+  <div class="switch" role="group" aria-label="Perspectiva">
+    <button type="button" data-lens="atk" aria-pressed="true">El atacante</button>
+    <button type="button" data-lens="eng" aria-pressed="false">La ingeniera</button>
+  </div>
+</div>
+
+<header class="hero">
+  <h1><span class="l1">Piensa como atacante,</span><span class="l2">construye como ingeniero</span></h1>
+  <p class="sub">Un recorrido por el modelado de amenazas aplicado a un sistema de radicación de PQRS: qué construimos, qué puede salir mal, qué hacemos al respecto y cómo comprobamos que funcionó.</p>
+  <p class="disclaimer"><strong>RadicaPQRS es un proyecto de ejemplo</strong> creado solo para esta actividad académica. No corresponde a ningún sistema ni entidad real.</p>
+  <p class="author"><strong>Nohra María Vizcaíno Florez</strong><br>Seguridad en el Desarrollo de Software, UNIMINUTO</p>
+</header>
+
+<main>
+
+<!-- Zona 1 -->
+<section class="zone" id="por-que" aria-labelledby="h-porque">
+  <h2 id="h-porque">¿Por qué un proceso estándar y repetible?</h2>
+  <p>La seguridad es un requerimiento no funcional: la capacidad del software de resistir la explotación de sus vulnerabilidades. Por eso existen los ciclos de vida de desarrollo de software seguro (S-SDLC), que integran la seguridad como componente básico de la arquitectura y no como un parche al final <span class="cite">(Hernández y Baquero, 2020, p. 6)</span>. Todos coinciden en algo: el modelado de amenazas es una actividad central, no opcional.</p>
+  <div class="notes">
+    <article class="note">
+      <h3>Microsoft SDL</h3>
+      <p>16 actividades organizadas en fases, de la capacitación a la respuesta a incidentes. Incluye el modelado de amenazas en la fase de diseño <span class="cite">(Hernández y Baquero, 2020, pp. 8-9)</span>.</p>
+    </article>
+    <article class="note">
+      <h3>Touchpoints de McGraw</h3>
+      <p>Siete puntos de control: casos de abuso, requisitos de seguridad, análisis de riesgo de arquitectura, revisión de código, pruebas basadas en riesgo, pruebas de penetración y operaciones <span class="cite">(p. 7)</span>.</p>
+    </article>
+    <article class="note">
+      <h3>OWASP SAMM</h3>
+      <p>Cuatro funciones: gobierno, construcción, verificación y despliegue. La evaluación de amenazas es una práctica de la función de construcción <span class="cite">(pp. 11-15)</span>.</p>
+    </article>
+    <article class="note">
+      <h3>CLASP</h3>
+      <p>Asigna el análisis de seguridad de requisitos y diseño, es decir, el modelado de amenazas, al rol de auditor de seguridad <span class="cite">(p. 14)</span>.</p>
+    </article>
+  </div>
+  <p class="takeaway">Repetible significa que la seguridad no depende de la memoria de un desarrollador, sino de un proceso que cualquier equipo puede seguir y auditar.</p>
+</section>
+
+<!-- Zona 2 -->
+<section class="zone" id="alcance" aria-labelledby="h-alcance">
+  <h2 id="h-alcance">Paso 1. ¿Qué estamos construyendo?</h2>
+  <p class="step">OWASP organiza el modelado de amenazas en cuatro pasos. El primero es entender el sistema: diagramas de flujo de datos, puntos de entrada, activos y niveles de confianza <span class="cite">(Conklin, s. f.)</span>.</p>
+  <p><strong>RadicaPQRS</strong> permite a la ciudadanía radicar peticiones, quejas, reclamos y sugerencias con archivos adjuntos, y consultar su estado con un número de radicado. Los funcionarios inician sesión para asignarlas y responderlas. Corre en un servidor de aplicaciones Java y guarda la información en una base de datos Oracle.</p>
+
+  <div class="legend" aria-hidden="true">
+    <span class="lg-atk">Vista del atacante: dónde golpearía</span>
+    <span class="lg-eng">Vista de la ingeniera: qué control lo detiene</span>
+  </div>
+  <div class="dfd-wrap">
+    <svg class="dfd" viewBox="0 0 980 440" role="img" aria-labelledby="dfd-t dfd-d">
+      <title id="dfd-t">Diagrama de flujo de datos de RadicaPQRS</title>
+      <desc id="dfd-d">Ciudadano y funcionario acceden por Internet al portal RadicaPQRS en la zona desmilitarizada. El portal usa un servicio de autenticación JAAS y se comunica con la base de datos Oracle y el repositorio de adjuntos en la red interna. Un servicio de correo externo envía notificaciones. Hay dos límites de confianza: entre Internet y la zona desmilitarizada, y entre esta y la red interna.</desc>
+      <defs>
+        <marker id="ar" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0L10 5L0 10z" fill="#1D2B3A"/></marker>
+      </defs>
+      <!-- Zonas -->
+      <text x="20" y="28" font-size="15" font-weight="700" class="zone-label">Internet</text>
+      <text x="330" y="28" font-size="15" font-weight="700" class="zone-label">Zona desmilitarizada</text>
+      <text x="690" y="28" font-size="15" font-weight="700" class="zone-label">Red interna</text>
+      <line x1="300" y1="15" x2="300" y2="425" stroke="#B8322A" stroke-width="2" stroke-dasharray="8 6"/>
+      <line x1="660" y1="15" x2="660" y2="425" stroke="#B8322A" stroke-width="2" stroke-dasharray="8 6"/>
+      <text x="306" y="420" font-size="12" class="boundary">límite de confianza</text>
+      <text x="666" y="420" font-size="12" class="boundary">límite de confianza</text>
+      <!-- Entidades externas -->
+      <rect x="40" y="70" width="180" height="60" fill="#fff" stroke="#1D2B3A" stroke-width="2"/>
+      <text x="130" y="106" text-anchor="middle" font-size="16" font-weight="700">Ciudadano</text>
+      <rect x="40" y="270" width="180" height="60" fill="#fff" stroke="#1D2B3A" stroke-width="2"/>
+      <text x="130" y="306" text-anchor="middle" font-size="16" font-weight="700">Funcionario</text>
+      <!-- Procesos -->
+      <circle cx="440" cy="150" r="72" fill="#fff" stroke="#1D2B3A" stroke-width="2"/>
+      <text x="440" y="146" text-anchor="middle" font-size="16" font-weight="700">Portal</text>
+      <text x="440" y="166" text-anchor="middle" font-size="16" font-weight="700">RadicaPQRS</text>
+      <circle cx="480" cy="330" r="58" fill="#fff" stroke="#1D2B3A" stroke-width="2"/>
+      <text x="480" y="326" text-anchor="middle" font-size="15" font-weight="700">Servicio de</text>
+      <text x="480" y="345" text-anchor="middle" font-size="15" font-weight="700">autenticación</text>
+      <!-- Almacenes -->
+      <line x1="720" y1="95" x2="930" y2="95" stroke="#1D2B3A" stroke-width="2"/>
+      <line x1="720" y1="145" x2="930" y2="145" stroke="#1D2B3A" stroke-width="2"/>
+      <text x="825" y="126" text-anchor="middle" font-size="16" font-weight="700">BD Oracle PQRS</text>
+      <line x1="720" y1="235" x2="930" y2="235" stroke="#1D2B3A" stroke-width="2"/>
+      <line x1="720" y1="285" x2="930" y2="285" stroke="#1D2B3A" stroke-width="2"/>
+      <text x="825" y="266" text-anchor="middle" font-size="16" font-weight="700">Repositorio de adjuntos</text>
+      <rect x="720" y="345" width="210" height="50" fill="#fff" stroke="#1D2B3A" stroke-width="2"/>
+      <text x="825" y="376" text-anchor="middle" font-size="15" font-weight="700">Servicio de correo</text>
+      <!-- Flujos -->
+      <path d="M220 100 L368 135" stroke="#1D2B3A" stroke-width="2" fill="none" marker-end="url(#ar)"/>
+      <text x="238" y="92" font-size="13">1. Radicar PQRS + adjuntos</text>
+      <path d="M220 295 L423 318" stroke="#1D2B3A" stroke-width="2" fill="none" marker-end="url(#ar)"/>
+      <text x="236" y="286" font-size="13">2. Credenciales</text>
+      <path d="M470 272 L458 222" stroke="#1D2B3A" stroke-width="2" fill="none" marker-end="url(#ar)"/>
+      <text x="474" y="252" font-size="13">3. Sesión</text>
+      <path d="M512 130 L716 120" stroke="#1D2B3A" stroke-width="2" fill="none" marker-end="url(#ar)"/>
+      <text x="560" y="112" font-size="13">4. Guardar / consultar</text>
+      <path d="M505 185 L716 255" stroke="#1D2B3A" stroke-width="2" fill="none" marker-end="url(#ar)"/>
+      <text x="580" y="200" font-size="13">5. Archivos</text>
+      <path d="M500 190 Q640 300 716 365" stroke="#1D2B3A" stroke-width="2" fill="none" marker-end="url(#ar)"/>
+      <text x="560" y="300" font-size="13">6. Número de radicado</text>
+
+      <!-- Capa atacante -->
+      <g class="layer-atk">
+        <g><circle cx="300" cy="118" r="17" fill="#B8322A"/><text x="300" y="125" text-anchor="middle" font-size="20" font-weight="700" fill="#fff">T</text></g>
+        <g><circle cx="330" cy="310" r="17" fill="#B8322A"/><text x="330" y="317" text-anchor="middle" font-size="20" font-weight="700" fill="#fff">S</text></g>
+        <g><circle cx="360" cy="205" r="17" fill="#B8322A"/><text x="360" y="212" text-anchor="middle" font-size="20" font-weight="700" fill="#fff">D</text></g>
+        <g><circle cx="515" cy="80" r="17" fill="#B8322A"/><text x="515" y="87" text-anchor="middle" font-size="20" font-weight="700" fill="#fff">R</text></g>
+        <g><circle cx="880" cy="70" r="17" fill="#B8322A"/><text x="880" y="77" text-anchor="middle" font-size="20" font-weight="700" fill="#fff">I</text></g>
+        <g><circle cx="400" cy="262" r="17" fill="#B8322A"/><text x="400" y="269" text-anchor="middle" font-size="20" font-weight="700" fill="#fff">E</text></g>
+      </g>
+      <!-- Capa ingeniera -->
+      <g class="layer-eng" font-size="12" font-weight="700">
+        <g><rect x="248" y="126" width="104" height="24" rx="12" fill="#12715B"/><text x="300" y="142" text-anchor="middle" fill="#fff">TLS</text></g>
+        <g><rect x="268" y="322" width="124" height="24" rx="12" fill="#12715B"/><text x="330" y="338" text-anchor="middle" fill="#fff">JAAS + certificado</text></g>
+        <g><rect x="306" y="193" width="124" height="24" rx="12" fill="#12715B"/><text x="368" y="209" text-anchor="middle" fill="#fff">Límite de envíos</text></g>
+        <g><rect x="470" y="50" width="120" height="24" rx="12" fill="#12715B"/><text x="530" y="66" text-anchor="middle" fill="#fff">Pista de auditoría</text></g>
+        <g><rect x="800" y="44" width="150" height="24" rx="12" fill="#12715B"/><text x="875" y="60" text-anchor="middle" fill="#fff">Cifrado + acceso por rol</text></g>
+        <g><rect x="336" y="250" width="120" height="24" rx="12" fill="#12715B"/><text x="396" y="266" text-anchor="middle" fill="#fff">Mínimo privilegio</text></g>
+      </g>
+    </svg>
+  </div>
+
+  <div class="cols">
+    <div>
+      <h3>Puntos de entrada</h3>
+      <ul class="list">
+        <li><span class="tag">E1.</span> Formulario público de radicación con adjuntos.</li>
+        <li><span class="tag">E2.</span> Inicio de sesión de funcionarios.</li>
+        <li><span class="tag">E3.</span> Consulta de estado por número de radicado.</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Activos</h3>
+      <ul class="list">
+        <li><span class="tag">A1.</span> Datos personales del peticionario.</li>
+        <li><span class="tag">A2.</span> Contenido de la PQRS, sus adjuntos y la respuesta.</li>
+        <li><span class="tag">A3.</span> Credenciales de los funcionarios.</li>
+        <li><span class="tag">A4.</span> Registro de quién hizo qué y cuándo.</li>
+      </ul>
+    </div>
+    <div>
+      <h3>Niveles de confianza</h3>
+      <ul class="list">
+        <li><span class="tag">N1.</span> Ciudadano anónimo.</li>
+        <li><span class="tag">N2.</span> Ciudadano con número de radicado.</li>
+        <li><span class="tag">N3.</span> Funcionario autenticado.</li>
+        <li><span class="tag">N4.</span> Administrador del sistema.</li>
+        <li><span class="tag">N5.</span> Usuario de base de datos de la aplicación.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<!-- Zona 3 -->
+<section class="zone" id="stride" aria-labelledby="h-stride">
+  <h2 id="h-stride">Paso 2. ¿Qué puede salir mal?</h2>
+  <p class="step">STRIDE agrupa las amenazas en seis categorías: suplantación, alteración, repudio, revelación de información, denegación de servicio y elevación de privilegios <span class="cite">(Hernández y Baquero, 2020, pp. 19-20)</span>. Toca cada nota para verla aplicada a RadicaPQRS. Cambia la perspectiva arriba para pasar del ataque a la defensa.</p>
+  <div class="stride">
+    <details class="threat">
+      <summary><span class="letter" aria-hidden="true">S</span><span><strong>Suplantación</strong><small>Punto de entrada E2</small></span><span class="risk alto">Riesgo alto</span></summary>
+      <div class="body">
+        <p class="atk-text"><span class="who">Cómo lo intentaría</span>Pruebo contraseñas comunes contra el inicio de sesión de un funcionario hasta entrar y responder o cerrar PQRS en su nombre.</p>
+        <p class="eng-text"><span class="who">Cómo lo detengo</span>Autenticación con JAAS y un módulo de inicio de sesión marcado como <code>required</code>, bloqueo tras intentos fallidos y certificado de cliente para funcionarios <span class="cite">(Ortega, 2018, pp. 274, 291)</span>.</p>
+      </div>
+    </details>
+    <details class="threat">
+      <summary><span class="letter" aria-hidden="true">T</span><span><strong>Alteración de datos</strong><small>Flujo 1 y activo A2</small></span><span class="risk medio">Riesgo medio</span></summary>
+      <div class="body">
+        <p class="atk-text"><span class="who">Cómo lo intentaría</span>Intercepto la radicación en una red wifi pública y modifico el texto o el adjunto antes de que lleguen al servidor.</p>
+        <p class="eng-text"><span class="who">Cómo lo detengo</span>Todo el tráfico va por TLS, que protege la integridad con un código de autenticación de mensajes (MAC), y cada adjunto se guarda con su hash para detectar cambios <span class="cite">(Ortega, 2018, p. 286; Conklin, s. f.)</span>.</p>
+      </div>
+    </details>
+    <details class="threat">
+      <summary><span class="letter" aria-hidden="true">R</span><span><strong>Repudio</strong><small>Activo A4</small></span><span class="risk medio">Riesgo medio</span></summary>
+      <div class="body">
+        <p class="atk-text"><span class="who">Cómo lo intentaría</span>Como funcionario, cierro una PQRS sin responderla y después niego haberlo hecho, porque el sistema no deja rastro.</p>
+        <p class="eng-text"><span class="who">Cómo lo detengo</span>Pistas de auditoría con marca de tiempo para cada cambio de estado, ligadas a la identidad autenticada del funcionario <span class="cite">(Conklin, s. f.)</span>.</p>
+      </div>
+    </details>
+    <details class="threat">
+      <summary><span class="letter" aria-hidden="true">I</span><span><strong>Revelación de información</strong><small>Punto de entrada E3 y activo A1</small></span><span class="risk alto">Riesgo alto</span></summary>
+      <div class="body">
+        <p class="atk-text"><span class="who">Cómo lo intentaría</span>Cambio el número de radicado en la consulta de estado hasta ver PQRS ajenas con nombres, documentos y direcciones.</p>
+        <p class="eng-text"><span class="who">Cómo lo detengo</span>La consulta exige el radicado y un código de verificación enviado al peticionario, los datos sensibles se cifran en la base de datos y los mensajes de error no revelan detalles internos <span class="cite">(Conklin, s. f.)</span>.</p>
+      </div>
+    </details>
+    <details class="threat">
+      <summary><span class="letter" aria-hidden="true">D</span><span><strong>Denegación de servicio</strong><small>Punto de entrada E1</small></span><span class="risk medio">Riesgo medio</span></summary>
+      <div class="body">
+        <p class="atk-text"><span class="who">Cómo lo intentaría</span>Automatizo miles de radicaciones con adjuntos pesados hasta saturar el servidor y el almacenamiento.</p>
+        <p class="eng-text"><span class="who">Cómo lo detengo</span>Filtrado y límite de envíos por origen, tamaño máximo de adjunto y validación del tipo de archivo <span class="cite">(Conklin, s. f.)</span>.</p>
+      </div>
+    </details>
+    <details class="threat">
+      <summary><span class="letter" aria-hidden="true">E</span><span><strong>Elevación de privilegios</strong><small>Niveles N3 y N4</small></span><span class="risk alto">Riesgo alto</span></summary>
+      <div class="body">
+        <p class="atk-text"><span class="who">Cómo lo intentaría</span>Con una cuenta de funcionario, escribo a mano la URL de administración para crear usuarios o ver PQRS de otras dependencias.</p>
+        <p class="eng-text"><span class="who">Cómo lo detengo</span>Mínimo privilegio y autorización programática: cada acción sensible verifica el sujeto autenticado con <code>AccessControlContext</code> antes de ejecutarse <span class="cite">(Ortega, 2018, pp. 282-283; Conklin, s. f.)</span>.</p>
+      </div>
+    </details>
+  </div>
+</section>
+
+<!-- Zona 4 -->
+<section class="zone half" id="prioridad" aria-labelledby="h-prioridad">
+  <h2 id="h-prioridad">¿Por dónde empezar?</h2>
+  <p>No todas las amenazas pesan igual. OWASP propone valorar probabilidad e impacto con niveles cualitativos (alto, medio, bajo), preguntando si el ataque se puede hacer de forma remota, si requiere autenticación y si se puede automatizar <span class="cite">(Conklin, s. f.)</span>.</p>
+  <div class="heat" role="table" aria-label="Matriz de probabilidad e impacto">
+    <div class="ax" role="columnheader"></div>
+    <div class="ax" role="columnheader">Impacto bajo</div>
+    <div class="ax" role="columnheader">Impacto medio</div>
+    <div class="ax" role="columnheader">Impacto alto</div>
+    <div class="ax" role="rowheader">Probabilidad alta</div>
+    <div class="cell c2" role="cell"></div>
+    <div class="cell c3" role="cell"><span class="chip" title="Denegación de servicio">D</span></div>
+    <div class="cell c3" role="cell"><span class="chip" title="Suplantación">S</span><span class="chip" title="Revelación de información">I</span></div>
+    <div class="ax" role="rowheader">Probabilidad media</div>
+    <div class="cell c1" role="cell"></div>
+    <div class="cell c2" role="cell"><span class="chip" title="Repudio">R</span><span class="chip" title="Alteración">T</span></div>
+    <div class="cell c3" role="cell"><span class="chip" title="Elevación de privilegios">E</span></div>
+    <div class="ax" role="rowheader">Probabilidad baja</div>
+    <div class="cell c1" role="cell"></div>
+    <div class="cell c1" role="cell"></div>
+    <div class="cell c2" role="cell"></div>
+  </div>
+  <p style="margin-top:1rem">Suplantación y revelación de información van primero: se pueden intentar desde Internet, sin autenticación previa y de forma automatizada, y comprometen datos personales.</p>
+</section>
+
+<section class="zone half" id="perfil" aria-labelledby="h-perfil">
+  <h2 id="h-perfil">El perfil de amenazas</h2>
+  <p>Con cada amenaza cruzada contra su contramedida, OWASP clasifica el resultado en tres grupos <span class="cite">(Conklin, s. f.)</span>:</p>
+  <div class="notes" style="grid-template-columns:1fr">
+    <article class="note"><h3>Sin mitigar</h3><p>No tienen contramedida: son vulnerabilidades explotables. En RadicaPQRS no debe quedar ninguna al salir a producción.</p></article>
+    <article class="note"><h3>Parcialmente mitigadas</h3><p>El control reduce el impacto, pero no lo elimina. Ejemplo: el límite de envíos frena la saturación, aunque no un ataque distribuido.</p></article>
+    <article class="note"><h3>Mitigadas</h3><p>Tienen contramedidas adecuadas y no exponen vulnerabilidades.</p></article>
+  </div>
+</section>
+
+<!-- Zona 5 -->
+<section class="zone" id="componentes" aria-labelledby="h-comp">
+  <h2 id="h-comp">Paso 3. ¿Qué vamos a hacer? Componentes seguros</h2>
+  <p class="step">Construir de forma estandarizada también significa no reinventar la seguridad: usar componentes probados que ya resuelven autenticación, autorización y comunicación cifrada. En Java, varios vienen con la plataforma <span class="cite">(Ortega, 2018, pp. 268-270)</span>.</p>
+  <div class="comp">
+    <article class="card">
+      <h3>La plataforma como primera defensa</h3>
+      <p>El verificador de bytecode, el cargador de clases, el Security Manager y las políticas de permisos controlan qué puede hacer el código en tiempo de ejecución. La firma de código permite verificar quién lo publicó y que no fue modificado <span class="cite">(Ortega, 2018, pp. 268-269)</span>.</p>
+      <p>En RadicaPQRS, el servidor de aplicaciones corre con una política que solo permite escribir en la carpeta del repositorio de adjuntos.</p>
+    </article>
+    <article class="card">
+      <h3>JAAS: quién eres y qué puedes hacer</h3>
+      <ol class="flow">
+        <li>La aplicación crea un <code>LoginContext</code> y llama a <code>login()</code>.</li>
+        <li>El contexto carga la configuración y el <code>LoginModule</code> definido.</li>
+        <li>El módulo pide usuario y contraseña a través del <code>CallbackHandler</code>.</li>
+        <li>Si la autenticación es correcta, se asignan identidades al <code>Subject</code>.</li>
+        <li>Si falla, se lanza una <code>LoginException</code>.</li>
+      </ol>
+      <p class="cite">(Ortega, 2018, p. 272)</p>
+      <p>Un buen detalle del ejemplo del autor: la contraseña se guarda como arreglo de caracteres y se borra con <code>clearPassword()</code> apenas se valida <span class="cite">(p. 278)</span>.</p>
+    </article>
+    <article class="card">
+      <h3>Cómo se combinan los módulos</h3>
+      <table class="flags">
+        <thead><tr><th scope="col">Bandera</th><th scope="col">Qué significa</th></tr></thead>
+        <tbody>
+          <tr><td><code>required</code></td><td>Debe tener éxito; aun si falla, se consultan los demás módulos.</td></tr>
+          <tr><td><code>requisite</code></td><td>Debe tener éxito; si falla, el proceso se detiene de inmediato.</td></tr>
+          <tr><td><code>sufficient</code></td><td>Si tiene éxito y ningún módulo requerido falló, el inicio de sesión es válido.</td></tr>
+          <tr><td><code>optional</code></td><td>Su resultado no afecta el proceso.</td></tr>
+        </tbody>
+      </table>
+      <p class="cite">(Ortega, 2018, pp. 274-275)</p>
+      <p>Para funcionarios, una combinación <code>requisite</code> (contraseña) + <code>required</code> (certificado) evita que un módulo débil baste por sí solo.</p>
+    </article>
+  </div>
+
+  <h3>El saludo seguro entre navegador y servidor</h3>
+  <p>SSL, hoy TLS, cifra la comunicación cliente-servidor y es la base de HTTPS. Antes de enviar cualquier dato, cliente y servidor negocian una clave de sesión <span class="cite">(Ortega, 2018, pp. 285-287)</span>. Recórrelo paso a paso:</p>
+  <div class="hs card">
+    <div class="hs-lane">
+      <span>Navegador del ciudadano</span>
+      <div class="hs-stage" id="hs-stage" aria-live="polite"></div>
+      <span>Servidor RadicaPQRS</span>
+    </div>
+    <div class="hs-controls">
+      <button type="button" class="btn" id="hs-prev">Anterior</button>
+      <button type="button" class="btn" id="hs-next">Siguiente</button>
+      <span class="hs-count" id="hs-count"></span>
+    </div>
+    <p class="warn"><strong>Actualización necesaria.</strong> El libro ilustra el proceso con el cifrador RC4. Desde 2015, el estándar RFC 7465 prohíbe que clientes y servidores TLS negocien suites RC4 en cualquier versión del protocolo <span class="cite">(Popov, 2015)</span>. RadicaPQRS debe configurarse para rechazarlas.</p>
+  </div>
+
+  <h3>Certificados: de la práctica a producción</h3>
+  <p>Con <code>keytool</code> se genera el almacén de claves del servidor. Un certificado autofirmado sirve para pruebas, pero el navegador mostrará una advertencia; en producción se necesita uno firmado por una autoridad de certificación reconocida <span class="cite">(Ortega, 2018, pp. 289-290)</span>. Por defecto, HTTPS solo autentica al servidor. Si el servidor activa <code>setNeedClientAuth(true)</code>, el cliente también debe presentar su certificado <span class="cite">(p. 291)</span>, que es justo lo que pedimos a los funcionarios de RadicaPQRS.</p>
+</section>
+
+<!-- Zona 6 -->
+<section class="zone" id="verificar" aria-labelledby="h-verif">
+  <h2 id="h-verif">Paso 4. ¿Hicimos un buen trabajo?</h2>
+  <p class="step">OWASP cierra el proceso verificando que existan tres registros: el diagrama, la lista de amenazas y la lista de controles <span class="cite">(Conklin, s. f.)</span>. Después vienen las pruebas y la operación.</p>
+  <div class="cols">
+    <div>
+      <h3>En pruebas</h3>
+      <p>Los Touchpoints combinan pruebas funcionales de seguridad con pruebas basadas en el riesgo a partir de patrones de ataque, y suman pruebas de penetración con hacking ético controlado <span class="cite">(Hernández y Baquero, 2020, p. 7)</span>. En SDL, la verificación comprueba que el software en ejecución se comporta según el diseño <span class="cite">(p. 9)</span>.</p>
+    </div>
+    <div>
+      <h3>En ejecución</h3>
+      <p>Los ataques ocurren a pesar del mejor diseño, así que monitorear el comportamiento del software en producción es una defensa esencial <span class="cite">(p. 7)</span>. SDL exige además un plan de respuesta a incidentes antes del lanzamiento <span class="cite">(p. 9)</span>.</p>
+    </div>
+  </div>
+  <h3>Lista de verificación de RadicaPQRS</h3>
+  <p>Cada prueba nace de una amenaza del paso 2. Márcalas a medida que las revises:</p>
+  <ul class="check" id="checklist">
+    <li><label><input type="checkbox"> Tras cinco contraseñas erradas, la cuenta del funcionario se bloquea (S).</label></li>
+    <li><label><input type="checkbox"> Un adjunto modificado después de radicado no coincide con su hash registrado (T).</label></li>
+    <li><label><input type="checkbox"> Cada cierre de PQRS queda en la auditoría con usuario, fecha y hora (R).</label></li>
+    <li><label><input type="checkbox"> Cambiar el número de radicado sin el código de verificación no muestra datos ajenos (I).</label></li>
+    <li><label><input type="checkbox"> Cien radicaciones por minuto desde un mismo origen son rechazadas (D).</label></li>
+    <li><label><input type="checkbox"> Un funcionario que abre la URL de administración recibe acceso denegado (E).</label></li>
+    <li><label><input type="checkbox"> El servidor rechaza una conexión que solo ofrece suites RC4.</label></li>
+  </ul>
+  <div class="progress" aria-hidden="true"><span id="progress"></span></div>
+  <p class="hs-count" id="progress-text" aria-live="polite"></p>
+</section>
+
+<!-- Zona 7 -->
+<section class="zone" id="video" aria-labelledby="h-video">
+  <h2 id="h-video">Para profundizar</h2>
+  <p id="video-caption">Las cuatro preguntas que ordenan este mural (qué construimos, qué puede salir mal, qué haremos y si lo hicimos bien) resumen el enfoque de modelado de amenazas que promueve OWASP. Video en inglés; puedes activar los subtítulos traducidos al español en YouTube.</p>
+  <div class="video">
+    <iframe id="video-frame" title="Video sobre el marco de las cuatro preguntas del modelado de amenazas" loading="lazy" allow="accelerometer; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+  </div>
+</section>
+
+<!-- Referencias -->
+<section class="zone refs" id="referencias" aria-labelledby="h-refs">
+  <h2 id="h-refs">Referencias</h2>
+  <p>Conklin, L. (s. f.). <em>Threat modeling process</em>. OWASP Foundation. https://community.owasp.org/Threat_Modeling_Process</p>
+  <p>Hernández Bejarano, M., y Baquero Rey, L. E. (2020). <em>Ciclo de vida de desarrollo ágil de software seguro</em>. Fundación Universitaria Los Libertadores. http://hdl.handle.net/11371/3808</p>
+  <p>Ortega Candel, J. M. (2018). <em>Seguridad en aplicaciones web Java</em>. RA-MA Editorial. https://elibro.net/es/ereader/uniminuto/106511</p>
+  <p>Popov, A. (2015). <em>Prohibiting RC4 cipher suites</em> (RFC 7465). Internet Engineering Task Force. https://www.rfc-editor.org/rfc/rfc7465</p>
+</section>
+
+</main>
+
+<footer>
+  <p>Mural elaborado para la actividad "Mural digital. Implementación del software seguro". RadicaPQRS es un caso ficticio con fines académicos.</p>
+</footer>
+
+<script>
+// ID del video de YouTube: cámbialo aquí si eliges otro
+const VIDEO_ID = "RW3zRevd-hE";
+document.getElementById("video-frame").src = "https://www.youtube-nocookie.com/embed/" + VIDEO_ID;
+
+// Perspectiva atacante / ingeniera
+const lensButtons = document.querySelectorAll(".switch button");
+lensButtons.forEach(btn => btn.addEventListener("click", () => {
+  document.body.dataset.lens = btn.dataset.lens;
+  lensButtons.forEach(b => b.setAttribute("aria-pressed", String(b === btn)));
+}));
+
+// Handshake TLS (Ortega, 2018, pp. 285-287)
+const steps = [
+  {dir:"→", title:"client_hello", text:"El navegador envía las versiones del protocolo que soporta, 32 bytes aleatorios, un ID de sesión y su lista de cifradores."},
+  {dir:"←", title:"server_hello + certificado", text:"El servidor elige versión y cifrador, envía sus propios 32 bytes aleatorios y su certificado X.509 firmado por una autoridad, con su clave pública."},
+  {dir:"→", title:"client_key_exchange", text:"El navegador verifica el certificado y envía el secreto para construir la clave de sesión, cifrado con la clave pública del servidor."},
+  {dir:"→ ←", title:"change_cipher_spec + finished", text:"Ambos confirman el cambio. Desde aquí, todo viaja cifrado con la clave simétrica de sesión y protegido con un MAC."}
+];
+let i = 0;
+const stage = document.getElementById("hs-stage"), count = document.getElementById("hs-count");
+const prev = document.getElementById("hs-prev"), next = document.getElementById("hs-next");
+function render(){
+  const s = steps[i];
+  stage.innerHTML = '<span class="hs-arrow" aria-hidden="true">' + s.dir + '</span><strong>' + s.title + '</strong><br>' + s.text;
+  count.textContent = "Paso " + (i + 1) + " de " + steps.length;
+  prev.disabled = i === 0; next.disabled = i === steps.length - 1;
+}
+prev.addEventListener("click", () => { if (i > 0) { i--; render(); } });
+next.addEventListener("click", () => { if (i < steps.length - 1) { i++; render(); } });
+render();
+
+// Lista de verificación
+const boxes = document.querySelectorAll("#checklist input");
+const bar = document.getElementById("progress"), ptext = document.getElementById("progress-text");
+function update(){
+  const done = [...boxes].filter(b => b.checked).length;
+  bar.style.width = (done / boxes.length * 100) + "%";
+  ptext.textContent = done + " de " + boxes.length + " pruebas revisadas";
+}
+boxes.forEach(b => b.addEventListener("change", update));
+update();
+</script>
+</body>
+</html>
