@@ -150,9 +150,37 @@ body[data-lens="eng"] .atk-text{display:none}
 .chip{font-family:var(--hand);font-size:1.5rem;font-weight:700;width:2rem;height:2rem;display:grid;place-items:center;border-radius:50%;background:var(--paper);border:2px solid var(--ink)}
 
 /* Componentes */
-.comp{display:grid;gap:1rem;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));margin-top:.5rem}
-.card{border:1px solid var(--line);border-radius:6px;padding:1rem;background:#FBFCFD}
-.card h3{margin-top:0}
+.comp{display:grid;gap:1.4rem;grid-template-columns:1fr;margin-top:1rem}
+@media (min-width:760px){.comp{grid-template-columns:repeat(2,1fr)}}
+.comp .card{padding:1.1rem 1.1rem 1.2rem;border-radius:2px;box-shadow:2px 4px 0 rgba(29,43,58,.15)}
+.comp .card:nth-child(1){background:#E1F5FE;transform:rotate(-.8deg)}
+.comp .card:nth-child(2){background:#FFE27A;transform:rotate(.7deg)}
+.comp .card:nth-child(3){background:#E8F5E9;transform:rotate(-.5deg)}
+.comp .card:nth-child(4){background:#FCE4EC;transform:rotate(.9deg)}
+.comp .card h3,.pnote h3{font-family:var(--hand);font-size:1.7rem;line-height:1.1;margin:0 0 .4rem}
+.comp .card p{font-size:.97rem}
+.comp code{background:rgba(255,255,255,.65)}
+.comp .flags th,.comp .flags td{border-bottom-color:rgba(29,43,58,.18)}
+
+/* Paso 4 como notas */
+.pnotes{display:grid;gap:1.4rem;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));margin-top:1rem}
+.pnote{padding:1.1rem;border-radius:2px;box-shadow:2px 4px 0 rgba(29,43,58,.15)}
+.pnote:nth-child(1){background:#E1F5FE;transform:rotate(-.7deg)}
+.pnote:nth-child(2){background:#E8F5E9;transform:rotate(.8deg)}
+.pnote p{margin:0;font-size:.97rem}
+
+/* Lista de verificación como hoja de cuaderno */
+.sheet{
+  position:relative;margin:2rem auto 0;max-width:760px;background:#FFFDF6;
+  padding:1.6rem 1.4rem 1.2rem 3.2rem;border-radius:2px;box-shadow:2px 4px 0 rgba(29,43,58,.12);
+  background-image:linear-gradient(90deg,transparent 2.4rem,#F2B8B3 2.4rem,#F2B8B3 calc(2.4rem + 2px),transparent calc(2.4rem + 2px));
+}
+.sheet::before{ /* cinta */
+  content:"";position:absolute;top:-12px;left:50%;width:120px;height:26px;transform:translateX(-50%) rotate(-2deg);
+  background:rgba(255,226,122,.75);box-shadow:0 1px 2px rgba(0,0,0,.12);
+}
+.sheet h3{font-family:var(--hand);font-size:1.8rem;margin:0 0 .2rem}
+.sheet .check li{margin:0;padding:.35rem 0;border-bottom:1px solid #DCE6EE}
 .flow{counter-reset:f;list-style:none;padding:0;margin:.4rem 0}
 .flow li{counter-increment:f;position:relative;padding-left:2rem;margin:.35rem 0;font-size:.97rem}
 .flow li::before{content:counter(f);position:absolute;left:0;top:.05rem;width:1.5rem;height:1.5rem;border-radius:50%;background:var(--ink);color:#fff;font-size:.8rem;display:grid;place-items:center;font-weight:700}
@@ -161,11 +189,39 @@ table.flags{border-collapse:collapse;width:100%;font-size:.93rem;margin-top:.4re
 code{font-size:.9em;background:#EEF1F4;padding:.05rem .3rem;border-radius:3px}
 
 /* Handshake */
-.hs{margin-top:.6rem}
-.hs-lane{display:grid;grid-template-columns:1fr 3fr 1fr;align-items:center;gap:.5rem;text-align:center;font-weight:700;font-size:.9rem}
-.hs-stage{min-height:120px;border:1px dashed var(--line);border-radius:6px;padding:.8rem;background:var(--paper);font-weight:400}
-.hs-arrow{font-size:1.6rem;display:block;color:var(--eng)}
-.hs-controls{display:flex;gap:.5rem;align-items:center;margin-top:.6rem}
+.hs{margin-top:.8rem;background:#F4F7FA;border:1px solid var(--line);border-radius:8px;padding:1.2rem clamp(.8rem,3vw,1.6rem)}
+.hs-scene{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:clamp(.4rem,2vw,1.2rem)}
+.actor{margin:0;text-align:center;width:clamp(84px,14vw,120px)}
+.actor svg{width:100%;height:auto;display:block}
+.actor figcaption{font-weight:700;font-size:.88rem;line-height:1.3;margin-top:.3rem}
+.hs-wire{position:relative;height:96px}
+.hs-wire::before{content:"";position:absolute;left:0;right:0;top:50%;border-top:3px dashed #9AA8B5;transition:border-color .3s}
+.hs-wire.secure::before{border-top:3px solid var(--eng)}
+.hs-msg{
+  position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);
+  background:var(--sticky);padding:.45rem .8rem;border-radius:2px;white-space:nowrap;
+  box-shadow:2px 3px 0 rgba(29,43,58,.18);font-weight:700;font-size:.92rem;
+}
+.hs-msg .dir{display:block;text-align:center;font-size:1.2rem;line-height:1;color:var(--ink)}
+.hs-wire.secure .hs-msg{background:var(--eng);color:#fff}
+.hs-wire.secure .hs-msg .dir{color:#fff}
+@keyframes toRight{from{left:12%}to{left:50%}}
+@keyframes toLeft{from{left:88%}to{left:50%}}
+@keyframes pop{from{transform:translate(-50%,-50%) scale(.6)}to{transform:translate(-50%,-50%) scale(1)}}
+.hs-msg.go-right{animation:toRight .6s ease-out}
+.hs-msg.go-left{animation:toLeft .6s ease-out}
+.hs-msg.go-both{animation:pop .4s ease-out}
+.hs .hs-text{background:var(--paper);border-radius:6px;padding:.8rem 1rem;margin:.8rem 0 0;min-height:4.5rem;max-width:none}
+@media (max-width:600px){
+  .hs-scene{grid-template-columns:1fr 1fr}
+  .hs-scene .actor{justify-self:center}
+  .hs-wire{grid-column:1/-1;grid-row:2;height:80px}
+  .hs-msg{white-space:normal;text-align:center;max-width:80%}
+}
+.hs-controls{display:flex;flex-wrap:wrap;gap:.6rem;align-items:center;margin-top:.8rem}
+.hs-dots{display:flex;gap:.4rem;margin:0 .4rem}
+.hs-dots button{width:.9rem;height:.9rem;border-radius:50%;border:2px solid var(--ink);background:var(--paper);padding:0;cursor:pointer}
+.hs-dots button[aria-current="step"]{background:var(--ink)}
 .btn{font:inherit;font-weight:700;border:2px solid var(--ink);background:var(--paper);border-radius:999px;padding:.3rem .9rem;cursor:pointer}
 .btn:disabled{opacity:.4;cursor:default}
 .hs-count{color:var(--ink-soft);font-size:.9rem}
@@ -480,14 +536,24 @@ footer{max-width:1180px;margin:0 auto;padding:0 clamp(1rem,4vw,2.5rem) 2.5rem;co
 
   <h3>El saludo seguro entre navegador y servidor</h3>
   <p>SSL, hoy TLS, cifra la comunicación cliente-servidor y es la base de HTTPS. Antes de enviar cualquier dato, cliente y servidor negocian una clave de sesión <span class="cite">(Ortega, 2018, pp. 285-287)</span>. Recórrelo paso a paso:</p>
-  <div class="hs card">
-    <div class="hs-lane">
-      <span>Navegador del ciudadano</span>
-      <div class="hs-stage" id="hs-stage" aria-live="polite"></div>
-      <span>Servidor RadicaPQRS</span>
+  <div class="hs">
+    <div class="hs-scene">
+      <figure class="actor">
+        <svg viewBox="0 0 120 90" aria-hidden="true"><rect x="18" y="8" width="84" height="56" rx="4" fill="#fff" stroke="#1D2B3A" stroke-width="3"/><rect x="26" y="16" width="68" height="40" fill="#E1F5FE"/><path d="M6 70h108l-8 12H14z" fill="#1D2B3A"/><circle cx="60" cy="36" r="9" fill="none" stroke="#1D2B3A" stroke-width="2.5"/><path d="M53 50c2-5 12-5 14 0" fill="none" stroke="#1D2B3A" stroke-width="2.5"/></svg>
+        <figcaption>Navegador del ciudadano</figcaption>
+      </figure>
+      <div class="hs-wire" id="hs-wire">
+        <div class="hs-msg" id="hs-msg"><span class="dir" id="hs-dir" aria-hidden="true"></span><span id="hs-title"></span></div>
+      </div>
+      <figure class="actor">
+        <svg viewBox="0 0 120 90" aria-hidden="true"><rect x="30" y="4" width="60" height="82" rx="4" fill="#fff" stroke="#1D2B3A" stroke-width="3"/><rect x="38" y="14" width="44" height="12" rx="2" fill="#E8F5E9" stroke="#1D2B3A" stroke-width="2"/><rect x="38" y="32" width="44" height="12" rx="2" fill="#E8F5E9" stroke="#1D2B3A" stroke-width="2"/><rect x="38" y="50" width="44" height="12" rx="2" fill="#E8F5E9" stroke="#1D2B3A" stroke-width="2"/><circle cx="74" cy="20" r="2.5" fill="#12715B"/><circle cx="74" cy="38" r="2.5" fill="#12715B"/><circle cx="74" cy="56" r="2.5" fill="#12715B"/></svg>
+        <figcaption>Servidor RadicaPQRS</figcaption>
+      </figure>
     </div>
+    <p class="hs-text" id="hs-text" aria-live="polite"></p>
     <div class="hs-controls">
       <button type="button" class="btn" id="hs-prev">Anterior</button>
+      <div class="hs-dots" id="hs-dots" role="group" aria-label="Pasos del saludo"></div>
       <button type="button" class="btn" id="hs-next">Siguiente</button>
       <span class="hs-count" id="hs-count"></span>
     </div>
@@ -502,29 +568,31 @@ footer{max-width:1180px;margin:0 auto;padding:0 clamp(1rem,4vw,2.5rem) 2.5rem;co
 <section class="zone" id="verificar" aria-labelledby="h-verif">
   <h2 id="h-verif">Paso 4. ¿Hicimos un buen trabajo?</h2>
   <p class="step">OWASP cierra el proceso verificando que existan tres registros: el diagrama, la lista de amenazas y la lista de controles <span class="cite">(Conklin, s. f.)</span>. Después vienen las pruebas y la operación.</p>
-  <div class="cols">
-    <div>
+  <div class="pnotes">
+    <article class="pnote">
       <h3>En pruebas</h3>
       <p>Los Touchpoints combinan pruebas funcionales de seguridad con pruebas basadas en el riesgo a partir de patrones de ataque, y suman pruebas de penetración con hacking ético controlado <span class="cite">(Hernández y Baquero, 2020, p. 7)</span>. En SDL, la verificación comprueba que el software en ejecución se comporta según el diseño <span class="cite">(p. 9)</span>.</p>
-    </div>
-    <div>
+    </article>
+    <article class="pnote">
       <h3>En ejecución</h3>
       <p>Los ataques ocurren a pesar del mejor diseño, así que monitorear el comportamiento del software en producción es una defensa esencial <span class="cite">(p. 7)</span>. SDL exige además un plan de respuesta a incidentes antes del lanzamiento <span class="cite">(p. 9)</span>.</p>
-    </div>
+    </article>
   </div>
-  <h3>Lista de verificación de RadicaPQRS</h3>
-  <p>Cada prueba nace de una amenaza del paso 2. Márcalas a medida que las revises:</p>
-  <ul class="check" id="checklist">
-    <li><label><input type="checkbox"> Tras cinco contraseñas erradas, la cuenta del funcionario se bloquea (S).</label></li>
-    <li><label><input type="checkbox"> Un adjunto modificado después de radicado no coincide con su hash registrado (T).</label></li>
-    <li><label><input type="checkbox"> Cada cierre de PQRS queda en la auditoría con usuario, fecha y hora (R).</label></li>
-    <li><label><input type="checkbox"> Cambiar el número de radicado sin el código de verificación no muestra datos ajenos (I).</label></li>
-    <li><label><input type="checkbox"> Cien radicaciones por minuto desde un mismo origen son rechazadas (D).</label></li>
-    <li><label><input type="checkbox"> Un funcionario que abre la URL de administración recibe acceso denegado (E).</label></li>
-    <li><label><input type="checkbox"> El servidor rechaza una conexión que solo ofrece suites RC4.</label></li>
-  </ul>
+  <div class="sheet">
+    <h3>Lista de verificación de RadicaPQRS</h3>
+    <p style="margin:0 0 .3rem">Cada prueba nace de una amenaza del paso 2. Márcalas a medida que las revises:</p>
+    <ul class="check" id="checklist">
+      <li><label><input type="checkbox"> Tras cinco contraseñas erradas, la cuenta del funcionario se bloquea (S).</label></li>
+      <li><label><input type="checkbox"> Un adjunto modificado después de radicado no coincide con su hash registrado (T).</label></li>
+      <li><label><input type="checkbox"> Cada cierre de PQRS queda en la auditoría con usuario, fecha y hora (R).</label></li>
+      <li><label><input type="checkbox"> Cambiar el número de radicado sin el código de verificación no muestra datos ajenos (I).</label></li>
+      <li><label><input type="checkbox"> Cien radicaciones por minuto desde un mismo origen son rechazadas (D).</label></li>
+      <li><label><input type="checkbox"> Un funcionario que abre la URL de administración recibe acceso denegado (E).</label></li>
+      <li><label><input type="checkbox"> El servidor rechaza una conexión que solo ofrece suites RC4.</label></li>
+    </ul>
   <div class="progress" aria-hidden="true"><span id="progress"></span></div>
   <p class="hs-count" id="progress-text" aria-live="polite"></p>
+  </div>
 </section>
 
 <!-- Zona 7 -->
@@ -574,17 +642,28 @@ setLens("atk");
 
 // Handshake TLS (Ortega, 2018, pp. 285-287)
 const steps = [
-  {dir:"→", title:"client_hello", text:"El navegador envía las versiones del protocolo que soporta, 32 bytes aleatorios, un ID de sesión y su lista de cifradores."},
-  {dir:"←", title:"server_hello + certificado", text:"El servidor elige versión y cifrador, envía sus propios 32 bytes aleatorios y su certificado X.509 firmado por una autoridad, con su clave pública."},
-  {dir:"→", title:"client_key_exchange", text:"El navegador verifica el certificado y envía el secreto para construir la clave de sesión, cifrado con la clave pública del servidor."},
-  {dir:"→ ←", title:"change_cipher_spec + finished", text:"Ambos confirman el cambio. Desde aquí, todo viaja cifrado con la clave simétrica de sesión y protegido con un MAC."}
+  {dir:"right", arrow:"→", title:"client_hello", text:"El navegador envía las versiones del protocolo que soporta, 32 bytes aleatorios, un ID de sesión y su lista de cifradores."},
+  {dir:"left", arrow:"←", title:"server_hello + certificado", text:"El servidor elige versión y cifrador, envía sus propios 32 bytes aleatorios y su certificado X.509 firmado por una autoridad, con su clave pública."},
+  {dir:"right", arrow:"→", title:"client_key_exchange", text:"El navegador verifica el certificado y envía el secreto para construir la clave de sesión, cifrado con la clave pública del servidor."},
+  {dir:"both", arrow:"⇄", title:"Canal cifrado", text:"Ambos envían change_cipher_spec y finished. Desde aquí, todo viaja cifrado con la clave simétrica de sesión y protegido con un MAC."}
 ];
 let i = 0;
-const stage = document.getElementById("hs-stage"), count = document.getElementById("hs-count");
+const msg = document.getElementById("hs-msg"), wire = document.getElementById("hs-wire");
+const dirEl = document.getElementById("hs-dir"), titleEl = document.getElementById("hs-title"), textEl = document.getElementById("hs-text");
+const count = document.getElementById("hs-count"), dots = document.getElementById("hs-dots");
 const prev = document.getElementById("hs-prev"), next = document.getElementById("hs-next");
+steps.forEach((s, n) => {
+  const d = document.createElement("button");
+  d.type = "button"; d.setAttribute("aria-label", "Paso " + (n + 1) + ": " + s.title);
+  d.addEventListener("click", () => { i = n; render(); });
+  dots.appendChild(d);
+});
 function render(){
   const s = steps[i];
-  stage.innerHTML = '<span class="hs-arrow" aria-hidden="true">' + s.dir + '</span><strong>' + s.title + '</strong><br>' + s.text;
+  dirEl.textContent = s.arrow; titleEl.textContent = s.title; textEl.textContent = s.text;
+  msg.classList.remove("go-right","go-left","go-both"); void msg.offsetWidth; msg.classList.add("go-" + s.dir);
+  wire.classList.toggle("secure", i === steps.length - 1);
+  [...dots.children].forEach((d, n) => n === i ? d.setAttribute("aria-current","step") : d.removeAttribute("aria-current"));
   count.textContent = "Paso " + (i + 1) + " de " + steps.length;
   prev.disabled = i === 0; next.disabled = i === steps.length - 1;
 }
